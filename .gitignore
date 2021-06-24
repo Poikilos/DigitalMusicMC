@@ -1,3 +1,4 @@
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -127,3 +128,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Project-specific files
+errors-lastrun--tag.txt
+1.Log.txt
+err.txt
+out.txt
+errors-lastrun--mencoder.txt
+errors-lastrun--lame.txt

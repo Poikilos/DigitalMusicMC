@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Play Music by Rating
+Type=Application
+Comment=Play Music by Rating
+Categories=Accessories
+#Path=/home/owner/Projects
+Exec=lxterminal --working-directory=/home/owner/Projects -e ./play_music_by_rating.sh
+Terminal=false
+StartupNotify=false
+Icon=/usr/share/icons/breeze/apps/48/juk.svg

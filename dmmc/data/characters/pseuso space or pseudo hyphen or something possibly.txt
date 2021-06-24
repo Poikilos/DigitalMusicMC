@@ -1,0 +1,4 @@
+openssl req -new -x509 -extensions v3_ca -keyout cakey.pem -out cacert.pem -days 3650
+(from https://help.ubuntu.com/lts/serverguide/certificates-and-security.html )
+does not work if pasted, does work if retyped
+-from self
