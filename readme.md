@@ -29,7 +29,7 @@ This project is a Python remake of a C# program I made that was never released (
 - If a song is an internet single, the Album tag value should be set to "Song Name [internet single]" where "Song Name" is the song name (" [internet single]" is literal).
 #### Sean Naming Scheme
 The Sean Naming Scheme (SNS) is a scheme for adding various metrics to Sean's massive collection by changing the filename. This is the situation because Sean is an archivalist using obscure formats with elusive tagging support, and he doesn't have advanced software or the skills to use it. Whether or not using the filename will be the ongoing method, the plan for supporting the SNS is as follows:
-- Derive the meaning of all characters in every filename in `dmmc/data/NotYetImplemented/filename-based_tag_generation--Sean_Naming_Scheme-songs.txt`
+- Derive the meaning of all characters in every filename in [dmmc/data/NotYetImplemented/filename-based_tag_generation--Sean_Naming_Scheme-songs.txt](dmmc/data/NotYetImplemented/filename-based_tag_generation--Sean_Naming_Scheme-songs.txt)
 
 The main advantage is that it is a multi-dimensional (or multi-metric) naming scheme, So you can have:
 1. Album, Artist, etc. (common metadata)
