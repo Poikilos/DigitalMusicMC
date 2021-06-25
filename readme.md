@@ -19,6 +19,7 @@ This project is a Python remake of a C# program I made that was never released (
 ## Credits
 - tsf.svg, tsf-*.* CC0 posted 2014 by [spadassin](https://openclipart.org/user-detail/spadassin) on openclipart.org.
   - See also `tsf license.txt`.
+- vintage_radio_drawing_5890254.png CC0 from https://pixy.org/5890254/
 
 ## Known Issues
 - In mencoder mode, cannot convert from mp4 or ogg and possibly some other common types (only supports mencoder native types AND lame)
