@@ -29,7 +29,7 @@ This project is a Python remake of a C# program I made that was never released (
 - If a song is an internet single, the Album tag value should be set to "Song Name [internet single]" where "Song Name" is the song name (" [internet single]" is literal).
 #### Sean Naming Scheme
 The Sean Naming Scheme (SNS) is a scheme for adding various metrics to Sean's massive collection by changing the filename. This is the situation because Sean is an archivalist using obscure formats with elusive tagging support, and he doesn't have advanced software or the skills to use it. Whether or not using the filename will be the ongoing method, the plan for supporting the SNS is as follows:
-- Derive the meaning of all characters in every filename in [dmmc/data/NotYetImplemented/filename-based_tag_generation--Sean_Naming_Scheme-songs.txt](dmmc/data/NotYetImplemented/filename-based_tag_generation--Sean_Naming_Scheme-songs.txt)
+- Derive the meaning of all characters in every filename in [tests/filename-based_tag_generation--Sean_Naming_Scheme-songs.txt](tests/filename-based_tag_generation--Sean_Naming_Scheme-songs.txt)
 
 The main advantage is that it is a multi-dimensional (or multi-metric) naming scheme, So you can have:
 1. Album, Artist, etc. (common metadata)
@@ -37,7 +37,11 @@ The main advantage is that it is a multi-dimensional (or multi-metric) naming sc
 3. Tag
 4. Rating
 
-Combining the data allows shuffling (or generating shuffled playlists) intelligently for huge collections: Playing all top-rated songs would be obtrusive, but using a generator string (see generate_playlist.py) such as `11211121113` you can space out the high-rated songs (on a scale of `0-3`). This makes the playlist good for long playback since it is both unobtrusive and breaks up the boredom. Adding in other metrics such as tags (such as "party") or category (such as "instrumental"). Having both tags and categories as separate metrics enables better results.
+Combining the data allows shuffling (or generating shuffled playlists) intelligently for huge collections.
+- Playing all top-rated songs would be obtrusive, but using a generator string (see generate_playlist.py) such as `11211121113` you can space out the high-rated songs (on a scale of `0-3`).
+  - This makes the playlist good for long playback since it is both unobtrusive and breaks up the boredom.
+- Adding in other metrics such as tags (such as "party") or category (such as "instrumental") adds multiple metrics, not merely multiple tags. Having both tags and categories as separate metrics enables better results.
+  - You don't need cloud AI to have a good selection. You can make your own decisions and this software can help you.
 
 
 ## Planned Features
@@ -168,7 +172,7 @@ Combining the data allows shuffling (or generating shuffled playlists) intellige
 
 ## Optional
 - add from.Sean filename-based tag generation
-  - see `dmmc/data/NotYetImplemented/filename-based_tag_generation--Sean_scheme.md`
+  - see [docs/filename-based_tag_generation--Sean_scheme.md](docs/filename-based_tag_generation--Sean_scheme.md)
 - Make able to play AM noise loop in background
 - Add global hook for multimedia keys (play/pause toggle, stop, previous, next) - allow volume and mute to be handled by the OS
 - Search for files that do not have artwork for their album

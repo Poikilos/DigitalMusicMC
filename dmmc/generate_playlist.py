@@ -69,35 +69,8 @@ if os.path.isdir(folder_path):
             #    song.artist = part[0]
 
             for part in parts:
-                #naming scheme (hyphen in between, whitespace ok but not required)
-                #title
-                #artist
-                #7,10,12 after album is inch size of vinyl, otherwise cd (could also be cd then album name, such as cd 40 for cd named 40 hits)
-                # -- could also just contain word such as "tape" in Wwmd tape 29a6 for a station named WWMD and tape named 29a6
-                # -- could also be radio, or yt for youtube
-                #genre
-                #(sometimes a hyphen is missing here)
-                # tags could be after album name, such as if I loved you - vocal - party
-                #    V for very relaxing
-                #song type (vocal, or I or i for instrumental)
-                #if says h4 (such as after vocal): named based on "h4 headlights"
-                # some more edge cases:
-                # And I Love Her-Manny Kellem-LP-love is blue-I-2.ogg
-                # Andrea - Bano & Power -tape-sempre-vocal-3.ogg
-                # Born to Be Wild - Enoch Light -LP-whoever-vocal-party-3.ogg
-                #    where "love is blue" or "sempre" or "whoever" is the name of the collection
-                # 4-68-3-Muzak-LP-4-68-I-1
-                #    where 4 is stream name, 68 is year (4 68 is album name)
-                # Muzak tape 2,1 -I-1
-                #    where album is "Muzak tape 2" track is 1, I for Instrumental, rating 1
-                # Blue Bayou - Muzak - LP-moe82-I-3
-                #    song name - artist - medium - album (muzak of the 80's published 1982) - type (instrumental) - rating
-                #              -        -        - could also be nd something (for New Dimensions Volume 2, or first one with no volume #)
-                # A Taste of Honey-Muzak-LP-4-68-I-1
-                # "have" means stuff was extracted from it, and the rest is elsewhere
-
-                # new naming scheme to suggest: title - medium - album - artist - genre - type - rating - use
-                # where type is vocal or I, and last hypen is optional, followed by something like party, or V for very relaxing
+                # Sean Naming Scheme (SNS):
+                # - See The DigitalMusicMC/docs directory.
                 part=part.strip()
                 #print(part)
                 index += 1
