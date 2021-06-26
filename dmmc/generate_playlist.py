@@ -69,10 +69,10 @@ if os.path.isdir(folder_path):
             #    song.artist = part[0]
 
             for part in parts:
-                # Sean Naming Scheme (SNS):
-                # - See The DigitalMusicMC/docs directory.
+                # Sean's Naming Scheme (SNS):
+                # - See SNS.md in the DigitalMusicMC/docs directory.
                 part=part.strip()
-                #print(part)
+                # print(part)
                 index += 1
 
 

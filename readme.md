@@ -8,7 +8,7 @@ The main focus on the project right now is to generate playlists intelligently.
 This project is a Python remake of a C# program I made that was never released (but was usable for certain tasks).
 - So far this Python remake can:
   - (WIP) (`dmmc/unmangle.py`) unmangle filenames by removing characters not compatible with some operating systems or file systems such as FAT32 for portable devices or drives used by car music players
-  - (`dmmc/generate_playlist.py`) generate playlists (Shuffle using numbers in the filename as per the *Sean Naming Scheme*--See below--This should improve eventually).
+  - (`dmmc/generate_playlist.py`) generate playlists (Shuffle using numbers in the filename as per the *Sean's Naming Scheme*--See below--This should improve eventually).
 - This project has been in the pre-alpha stage since at least 2010 as a C# GUI program that:
   - exports songs to portable music players
   - reencodes the files (if not compatible with player or bitrate is enforced)
@@ -44,9 +44,9 @@ The data directory contains required data.
 ### Tagging and Naming
 (preliminary)
 - If a song is an internet single, the Album tag value should be set to "Song Name [internet single]" where "Song Name" is the song name (" [internet single]" is literal).
-#### Sean Naming Scheme
-The Sean Naming Scheme (SNS) is a scheme for adding various metrics to Sean's massive collection by changing the filename. This is the situation because Sean is an archivalist using obscure formats with elusive tagging support, and he doesn't have advanced software or the skills to use it. Whether or not using the filename will be the ongoing method, the plan for supporting the SNS is as follows:
-- Derive the meaning of all characters in every filename in [tests/filename-based_tag_generation--Sean_Naming_Scheme-songs.txt](tests/filename-based_tag_generation--Sean_Naming_Scheme-songs.txt)
+#### Sean's Naming Scheme
+The Sean's Naming Scheme (SNS) is a scheme for adding various metrics to Sean's massive collection by changing the filename. This is the situation because Sean is an archivalist using obscure formats with elusive tagging support, and he doesn't have advanced software or the skills to use it. Whether or not using the filename will be the ongoing method, the plan for supporting the SNS is as follows:
+- Derive the meaning of all characters in every filename in [tests/SNS-songs.txt](tests/SNS-songs.txt)
 
 The main advantage is that it is a multi-dimensional (or multi-metric) naming scheme, So you can have:
 1. Album, Artist, etc. (common metadata)
