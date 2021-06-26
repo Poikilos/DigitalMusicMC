@@ -25,6 +25,14 @@ This project is a Python remake of a C# program I made that was never released (
 - In mencoder mode, cannot convert from mp4 or ogg and possibly some other common types (only supports mencoder native types AND lame)
 
 ## Conventions
+
+### Required Data
+The data directory contains required data.
+- The files in the "handled-by-code" directory are not required.
+  - In the "sequences" subdirectory, each file contains a sequence for modified characters such as accented character.
+    - The second part is placed after an alphabetical letter in storage but above the letter when displayed.
+    - The second part can't be stored alone in a file: As read by Python 3, the sequence counts as 2 characters together but the sequence counts as zero characters if you remove the preceding byte (the alphabetical character).
+
 ### Tagging and Naming
 (preliminary)
 - If a song is an internet single, the Album tag value should be set to "Song Name [internet single]" where "Song Name" is the song name (" [internet single]" is literal).

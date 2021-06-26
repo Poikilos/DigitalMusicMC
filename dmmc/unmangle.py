@@ -184,6 +184,31 @@ for sub in os.listdir(unusableCharsPath):
         unusableCharFiles[key] = sub
 # print("badChars:{}".format(badChars))
 
+# These are marks that come after an alphabetical letter and don't work
+# otherwise. See "handled-by-code" under "Required Data" in readme.
+unusableChars[chr(776)] = ""  # diaeresis
+unusableCharFiles[chr(776)] = sys.argv[0]
+unusableChars[chr(770)] = ""  # circumflex
+unusableCharFiles[chr(770)] = sys.argv[0]
+unusableChars[chr(778)] = ""  # ring
+unusableCharFiles[chr(778)] = sys.argv[0]
+unusableChars[chr(769)] = ""  # accent
+unusableCharFiles[chr(769)] = sys.argv[0]
+unusableChars[chr(768)] = ""  # grave accent (backward accent mark)
+unusableCharFiles[chr(768)] = sys.argv[0]
+
+# From STRATFORD CT. - CONFERO - Tora Tora:
+# - There is no other space around the hyphen so make them spaces
+unusableChars[chr(12302)] = " "  # box-outline-single-thick-top_left
+unusableChars[chr(12303)] = " "  # box-outline-single-thick-bottom_right
+
+# From Stratford Ct. - 1 yr Anniversary Compilation - fibre:
+unusableChars[chr(12300)] = ""  # box-outline-single-thin-top_left
+unusableChars[chr(12301)] = ""  # box-outline-single-thin-bottom_right
+
+# From STRATFORD CT. - CONFERO - Harrison:
+# unusableChars[chr(chr(10047))] = ""  # flower
+
 def isFilenameChar(c, index=-1):
     '''
     Sequential arguments:
@@ -270,20 +295,33 @@ def processBand(bandPath, bandName, sep=" - ", trackDigitsMin=2):
                 '''
             cleanName = ""
             prevBad = False
+            prevSpace = False
+            # TODO: Why does "_" never happen (character is removed
+            # instead)?
             for c_orig in songName:
                 c = c_orig
                 got = unusableChars.get(c)
                 if got is not None:
                     c = got
-                if isFilenameChar(c):
-                    cleanName += c
+                if (c == "") or isFilenameChar(c):
+                    # ^ Can be "" if unusableChars value is "" (If the
+                    #   character should be removed).
+                    if (c != " ") or (not prevSpace):
+                        cleanName += c
                     prevBad = False
+                    if c == " ":
+                        prevSpace = True
+                    elif c != "":
+                        prevSpace = False
                 else:
+                    print("removed chr({}) from...".format(ord(c)))
                     if not prevBad:
-                        songName += "_"
+                        cleanName += "_"
+                        prevSpace = False
                     prevBad = True
-            while cleanName.endswith("_") or cleanName.endswith(" "):
-                cleanName = cleanName[:-1]
+            cleanSplitName = os.path.splitext(cleanName)
+            cleanName = (cleanSplitName[0].strip()
+                         + cleanSplitName[1].strip())
             print("  {}".format(cleanName))
             songCount += 1
         print("  * processed {} song(s) in {}"
