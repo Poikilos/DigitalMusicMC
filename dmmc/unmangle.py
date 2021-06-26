@@ -15,18 +15,33 @@ The processBand function will automatically:
 
 Command Line Interface:
 
-Specify the band name in quotes such as via:
+Specify the band name (or any other whole element to remove from
+space-hyphen-space delimited directory names) in quotes such as via:
 
 python unmangle.py "Stratford Ct."
 '''
 import sys
 import os
+initializePreloadScreen = True
 
-usageS = '''
-Specify the band name in quotes such as via:
+myFileName = os.path.basename(__file__)
 
-python unmangle.py "Stratford Ct."
-'''
+def error(msg):
+    sys.stderr.write("{}\n".format(msg))
+
+def showTitle():
+    error("")
+    error("")
+    title = myName  # os.path.basename(sys.argv[0])
+    error(title)
+    error("-"*len(title))
+
+
+myName = "unmangle"
+__author__ = "Jake Gustafson"
+
+startCLIi = __doc__.find("Command Line Interface")
+usageS = __doc__[startCLIi:]
 
 songExts = ['mp3', 'wav', 'flac', 'alac', 'aac', 'mp4', 'm4a', 'ape']
 songDotExts = []
@@ -42,7 +57,7 @@ except OSError:
     readLink = __file__
 realFile = os.path.realpath(readLink)
 dataPath = os.path.dirname(realFile)
-# print("dataPath: {}".format(dataPath))
+# error("dataPath: {}".format(dataPath))
 unusableChars = {}
 unusableCharFiles = {}
 unusableCharsPath = os.path.join(dataPath, "data", "characters")
@@ -63,10 +78,12 @@ nameChars = {
     "apostraphe": "'",
     "doublequote": "\"",
     "singlequote": "'",
+    "dash": "--",
 }
 
 
-# See <https://stackoverflow.com/questions/2435894/how-do-i-check-for-illegal-characters-in-a-path>
+# See <https://stackoverflow.com/questions/2435894/how-do-i-check-for-
+# illegal-characters-in-a-path>
 # (`Path.GetInvalidFileNameChars` results on Windows, a superset of
 # `Path.GetInvalidPathChars`):
 windowsBadChars = ""
@@ -134,7 +151,6 @@ def getFirstCharOfLines(path):
             ret += line
     return ret
 
-
 for sub in os.listdir(unusableCharsPath):
     subPath = os.path.join(unusableCharsPath, sub)
     delimiter = "-faux"
@@ -161,28 +177,36 @@ for sub in os.listdir(unusableCharsPath):
                             key = getOneChar(subPath, encoding='utf-16')
                             # hyphen-faux.txt is 'iso-8859-1' according
                             # to Geany
-                        except Exception as ex3:
-                            print("* couldn't finish"
-                                  " reading \"{}\":".format(subPath))
-                            # raise ex3
+                        except UnicodeDecodeError as ex3:
+                            key = None
+                            error("[{}] * (UnicodeDecodeError)"
+                                  " couldn't finish reading \"{}\":"
+                                  "".format(myFileName, subPath))
                     else:
-                        print("* (unknown error) couldn't finish"
-                        " reading \"{}\":".format(subPath))
+                        error("[{}] * (unknown error) couldn't finish"
+                        " reading \"{}\":".format(myFileName, subPath))
                         raise ex2
             else:
-                print("* (unknown error) couldn't finish"
-                      " reading \"{}\":".format(subPath))
+                error("[{}] * (unknown error) couldn't finish"
+                      " reading \"{}\":".format(myFileName, subPath))
                 raise ex
         if getVerbose():
-            print("* gathering unusable character from \"{}\"".format(sub))
+            error("* gathering unusable character from \"{}\""
+                  "".format(sub))
+        if key is None:
+            continue
         if key in unusableChars.keys():
-            print("Warning: The unusable{} character from \"{}\" was"
-                  " already collected from \"{}\" and will be ignored."
+            if initializePreloadScreen:
+                showTitle()
+                initializePreloadScreen = False
+            error("[unmangle] Warning: The unusable{} character from"
+                  " \"{}\" was already collected from \"{}\" and will"
+                  " be ignored."
                   "".format(tryDelimiter, sub, unusableCharFiles[key]))
             continue
         unusableChars[key] = pathChar
         unusableCharFiles[key] = sub
-# print("badChars:{}".format(badChars))
+# error("badChars:{}".format(badChars))
 
 # These are marks that come after an alphabetical letter and don't work
 # otherwise. See "handled-by-code" under "Required Data" in readme.
@@ -234,8 +258,7 @@ def isFilenameChar(c, index=-1):
 
 
 def usage():
-    # print(usageS)
-    print(__doc__)
+    error(usageS)
 
 digits = "0123456789"
 alphaLowerChars = "abcdefghijklmnopqrstuvwxyz"
@@ -258,7 +281,7 @@ def processBand(bandPath, bandName, sep=" - ", trackDigitsMin=2):
             continue
         albumParts = album.split(sep)
         albumName = albumParts[-1]
-        print(albumName)
+        error(albumName)
         songCount = 0
         for song in os.listdir(albumPath):
             if not os.path.splitext(song)[-1].lower() in songDotExts:
@@ -280,7 +303,7 @@ def processBand(bandPath, bandName, sep=" - ", trackDigitsMin=2):
                     elif isDigits(songParts[-3][:trackDigitsMin]):
                         songName = sep.join(songParts[-3:])
                     else:
-                        print("  * Warning: No part of {} starts with"
+                        error("  * Warning: No part of {} starts with"
                               "    a 2-digit track number.")
                 if isDigits(songParts[-1][trackDigitsMin+1:]):
                     # In case the song name starts with more than 2
@@ -290,7 +313,7 @@ def processBand(bandPath, bandName, sep=" - ", trackDigitsMin=2):
                     elif isDigits(songParts[-3][:trackDigitsMin]):
                         songName = sep.join(songParts[-3:])
                     # else:
-                        # print("  * Warning: No part of {} starts with"
+                        # error("  * Warning: No part of {} starts with"
                         #       "    a 2-digit track number.")
                 '''
             cleanName = ""
@@ -314,7 +337,7 @@ def processBand(bandPath, bandName, sep=" - ", trackDigitsMin=2):
                     elif c != "":
                         prevSpace = False
                 else:
-                    print("removed chr({}) from...".format(ord(c)))
+                    error("removed chr({}) from...".format(ord(c)))
                     if not prevBad:
                         cleanName += "_"
                         prevSpace = False
@@ -322,15 +345,20 @@ def processBand(bandPath, bandName, sep=" - ", trackDigitsMin=2):
             cleanSplitName = os.path.splitext(cleanName)
             cleanName = (cleanSplitName[0].strip()
                          + cleanSplitName[1].strip())
-            print("  {}".format(cleanName))
+            error("  {}".format(cleanName))
             songCount += 1
-        print("  * processed {} song(s) in {}"
+        error("  * processed {} song(s) in {}"
               "".format(songCount, albumName))
-        print("")
+        error("")
 
 def main():
+    global initializePreloadScreen
+    if initializePreloadScreen:
+        showTitle()
+        initializePreloadScreen = False
     if len(sys.argv) != 2:
-        print(usageS)
+        error("")
+        usage()
         exit(1)
     processBand(".", sys.argv[1])
 
