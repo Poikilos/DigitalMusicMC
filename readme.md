@@ -16,13 +16,21 @@ This project is a Python remake of a C# program I made that was never released (
   - exports WinAmp playlists in bulk, making the filenames readable and the paths relative
   - (and does nothing else)
 
+
 ## Credits
 - tsf.svg, tsf-*.* CC0 posted 2014 by [spadassin](https://openclipart.org/user-detail/spadassin) on openclipart.org.
   - See also `tsf license.txt`.
 - vintage_radio_drawing_5890254.png CC0 from https://pixy.org/5890254/
 
+
+## Related Projects
+- (Ruby) [OverClocked-ReMix-Downloader](https://github.com/rmondello/OverClocked-ReMix-Downloader)
+- (various languages) [github.com/search?q=ocremix](https://github.com/search?q=ocremix)
+
+
 ## Known Issues
 - In mencoder mode, cannot convert from mp4 or ogg and possibly some other common types (only supports mencoder native types AND lame)
+
 
 ## Conventions
 
@@ -61,8 +69,8 @@ Combining the data allows shuffling (or generating shuffled playlists) intellige
   - add partial path mapper if drive and/or category folder is different but rest of path is same
   - if found at mapped location, do not ask
     - if re-asked, change existing mapping
-  - make a command where if the mapped from and mapped-to both exist, delete the mapped from
-    e.g. map ocremix album song from ocremix.org folder to Video Game Music\%album%\%disc%\%filetype%\ folder
+  - make a command where if the mapped from and mapped-to both exist, delete the mapped one
+    - map ocremix album song from ocremix.org folder to `Video Game Music\%album%\%disc%\%filetype%\` folder
     - and MOVE & RENAME if only exists at source (automatically create full dest folder path)
   - permanently store each type of file path mapper in BOM-marked unicode csv (partial.csv8, Fullname.csv8)
 - allow fixing m3u8 playlists (for loading and unicode byte order chunk, see DigitalMusicMC)
@@ -82,9 +90,9 @@ Combining the data allows shuffling (or generating shuffled playlists) intellige
 - Make list of checkboxes under headings such as "Hide by tag:" and "Hide by Category:"
   - defaults under "Hide by tag:"
     "Bleeps and Bloops", "Questionable", "Questionable Title", and "Dark"
-  - default under "Hide by Score:" <= **
+  - default under `"Hide by Score:" <= **`
 - Make many methods of categorizing
-- Make only converted files cached (such as to "%LOCALAPPDATA%\DigitalMusicMC\Music-transfertemp")
+- Make only converted files cached (such as to `%LOCALAPPDATA%\DigitalMusicMC\Music-transfertemp`)
   - Prevent creation of "Music" folder under that (?)
   - add option to clear cache
 - Make option to remove playlist from device
@@ -120,7 +128,7 @@ Combining the data allows shuffling (or generating shuffled playlists) intellige
 - Add option to remove all jpg files (or other extension; non-music by default) from playlists.
 - Show the image in the folder of nearest depth as song thumbnail, named such as: Folder.*, cover.*, album.*
 - stop showing every line in tbStatus upon File, Copy playlists to folder...
-- integrate D:\Projects\DigitalMusicMC\playlistfix into DigitalMusicMC
+- integrate `D:\Projects\DigitalMusicMC\playlistfix` into DigitalMusicMC
 - Remove files from a playlist if they are in a certain path or subfolder under it (such as `D:\Music\Video Game Music\Final Fantasy VII - Voices of the Lifestream\MP3_unused`)
 - Remove files from a playlist that have a higher-quality equivalent
 - Tag file types:
@@ -164,7 +172,7 @@ Combining the data allows shuffling (or generating shuffled playlists) intellige
 - Change playback speed
 - Ability to cause a search folder to always set the category (or have a folder set category)
   - example of search folder sets category:
-    all songs found in search folder "E:\Music\vgmix.com" are set to "vgmix.com" category
+    all songs found in search folder `E:\Music\vgmix.com` are set to "vgmix.com" category
   - example of folder set category:
     `E:\Music\%Category%\%Artist%\%Album%` (but never do this, since each of my categories have different folder structure below Category)
 - Undo possible for (applies to any playlist viewer including "Now Playing" playlist):

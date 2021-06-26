@@ -4,24 +4,30 @@
   album directories that contain music files.
 - The files and directories may be weird, named with space-padded
   hyphens separating each part (only " - " is accepted unless you
-  specify sep to the processBand function), and unicode characters.
+  specify songSep or albumSep to the processBand function), and unicode
+  characters.
 
-The processBand function will automatically:
-- Rename files with unicode characters and make them ASCII.
-- Remove invalid characters or spaces from the end of the filename.
+By default, processBand function will automatically:
 - Rename files so they only contain the song name (and any other info
   such as the track number after the band and album name).
+  - Remove unicode characters and make them ASCII.
 - Rename directories so they only contain the album name.
+- Save an "original_names.json" file to the album folder if any names
+  changed.
 
 Command Line Interface:
 
 Specify the band name (or any other whole element to remove from
-space-hyphen-space delimited directory names) in quotes such as via:
+space-hyphen-space [" - "] delimited directory names) in quotes.
 
-python unmangle.py "Stratford Ct."
+Example:
+unmangle.py "Stratford Ct."
 '''
 import sys
 import os
+import json
+import shutil
+
 initializePreloadScreen = True
 
 myFileName = os.path.basename(__file__)
@@ -273,48 +279,90 @@ def isDigits(s):
     return True
 
 
-def processBand(bandPath, bandName, sep=" - ", trackDigitsMin=2):
+def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
+                trackDigitsMin=2, output_only=False):
+    '''
+    Sequential arguments:
+    bandPath -- The band directory contains album directories which
+                contain song files, and only directories and files in
+                that structure will be processed.
+    bandName -- Set the name of the band or another whole element
+                delimited by albumSep to remove from the album directory
+                name. For example,
+                "Stratford Ct. - Secret Selection #41-50" becomes
+                "Secret Selection #41-50".
+
+    Keyword arguments:
+    albumSep -- Break apart the album directory name using this
+                delimiter. Only the last part of the directory name
+                should be kept. For example, if albumSep is " - " and
+                the directory name is "Band - Album" the directory gets
+                renamed to "Album".
+    songSep -- Break apart the song file name using this delimiter.
+               Only the last part or part starting with track
+               numbers should be kept. For example,
+               "Artist - Album - # Title - some extra stuff.mp3" becomes
+               "Artist - Album - # Title - some extra stuff.mp3", where
+               # is a track number at least trackDigitsMin digits long.
+    trackDigitsMin -- Detect where the new filename should start in
+                      terms of the old filename by detecting this in
+                      the 2nd to last and 3rd to last parts (if
+                      neither, then only keep last part).
+    output_only -- Output rename commands and do not actually rename
+                   any files.
+    '''
+    fileRenames = 0
+    folderRenames = 0
     bandPath = os.path.realpath(bandPath)
+    verb = "unmangled"
+    if output_only:
+        verb = "unmangle"
     for album in os.listdir(bandPath):
+        albumFileRenames = 0
         albumPath = os.path.join(bandPath, album)
         if not os.path.isdir(albumPath):
             continue
-        albumParts = album.split(sep)
-        albumName = albumParts[-1]
-        error(albumName)
+        albumParts = album.split(albumSep)
+        cleanAlbum = albumParts[-1]
+        error(cleanAlbum)
         songCount = 0
+        historyPath = os.path.join(albumPath, "original_names.json")
+        changed = {}
+        changed['songs'] = {}
         for song in os.listdir(albumPath):
-            if not os.path.splitext(song)[-1].lower() in songDotExts:
+            songPath = os.path.join(albumPath, song)
+            songNoExt = os.path.splitext(song)[-1]
+            if not songNoExt.lower() in songDotExts:
                 continue
-            songParts = song.split(sep)
+            songParts = song.split(songSep)
             songName = songParts[-1]
             if len(songParts) > 1:
                 # In case the song name starts with trackDigitsMin
-                # or more numbers, check previous parts regardless of
-                # what last part looks like:
+                # or more numbers, check previous parts regardless
+                # of what last part looks like:
                 if isDigits(songParts[-2][:trackDigitsMin]):
-                    songName = sep.join(songParts[-2:])
+                    songName = songSep.join(songParts[-2:])
                 elif isDigits(songParts[-3][:trackDigitsMin]):
-                    songName = sep.join(songParts[-3:])
+                    songName = songSep.join(songParts[-3:])
                 '''
                 if not isDigits(songParts[-1][:trackDigitsMin]):
                     if isDigits(songParts[-2][:trackDigitsMin]):
-                        songName = sep.join(songParts[-2:])
+                        songName = songSep.join(songParts[-2:])
                     elif isDigits(songParts[-3][:trackDigitsMin]):
-                        songName = sep.join(songParts[-3:])
+                        songName = songSep.join(songParts[-3:])
                     else:
-                        error("  * Warning: No part of {} starts with"
-                              "    a 2-digit track number.")
+                        error("  * Warning: No part of {} starts"
+                              "    with a 2-digit track number.")
                 if isDigits(songParts[-1][trackDigitsMin+1:]):
                     # In case the song name starts with more than 2
                     # numbers:
                     if isDigits(songParts[-2][:trackDigitsMin]):
-                        songName = sep.join(songParts[-2:])
+                        songName = songSep.join(songParts[-2:])
                     elif isDigits(songParts[-3][:trackDigitsMin]):
-                        songName = sep.join(songParts[-3:])
+                        songName = songSep.join(songParts[-3:])
                     # else:
-                        # error("  * Warning: No part of {} starts with"
-                        #       "    a 2-digit track number.")
+                        # error("  * Warning: No part of {} starts"
+                        #       "    with a 2-digit track number.")
                 '''
             cleanName = ""
             prevBad = False
@@ -327,8 +375,8 @@ def processBand(bandPath, bandName, sep=" - ", trackDigitsMin=2):
                 if got is not None:
                     c = got
                 if (c == "") or isFilenameChar(c):
-                    # ^ Can be "" if unusableChars value is "" (If the
-                    #   character should be removed).
+                    # ^ Can be "" if unusableChars value is "" (If
+                    #   the character should be removed).
                     if (c != " ") or (not prevSpace):
                         cleanName += c
                     prevBad = False
@@ -346,10 +394,38 @@ def processBand(bandPath, bandName, sep=" - ", trackDigitsMin=2):
             cleanName = (cleanSplitName[0].strip()
                          + cleanSplitName[1].strip())
             error("  {}".format(cleanName))
+            if cleanName != song:
+                changed['songs'][cleanName] = song
+                cleanPath = os.path.join(albumPath, cleanName)
+                fileRenames += 1
+                albumFileRenames += 1
+                if output_only:
+                    print("mv \"{}\" \"{}\""
+                          "".format(songPath, cleanPath))
+                else:
+                    shutil.move(songPath, cleanPath)
             songCount += 1
+        if cleanAlbum != album:
+            if 'folders' not in changed:
+                changed['folders'] = {}
+            changed['folders'][cleanAlbum] = album
+            cleanAlbumPath = os.path.join(bandPath, cleanAlbum)
+        if not os.path.isfile(historyPath):
+            with open(historyPath, 'w') as outs:
+                json.dump(changed, outs, sort_keys=True, indent=2)
+        if cleanAlbum != album:
+            folderRenames += 1
+            if output_only:
+                print("mv \"{}\" \"{}\""
+                      "".format(albumPath, cleanAlbumPath))
+            else:
+                shutil.move(albumPath, cleanAlbumPath)
         error("  * processed {} song(s) in {}"
-              "".format(songCount, albumName))
+              " ({} {})"
+              "".format(songCount, cleanAlbum, verb, albumFileRenames))
         error("")
+    error("* {} {} files and {} directory(ies) total"
+          "".format(verb, fileRenames, folderRenames))
 
 def main():
     global initializePreloadScreen
