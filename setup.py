@@ -16,9 +16,6 @@ import sys
 # versionedModule['urllib'] = 'urllib'
 # if python_mr == 2:
 #     versionedModule['urllib'] = 'urllib2'
-# long_description = ""
-with open("readme.md", "r") as fh:
-    long_description = fh.read()
 
 install_requires = []
 
@@ -33,6 +30,10 @@ if os.path.isfile("requirements.txt"):
 description = '''Manage a large archival music collection including
 using optional archival syntax. Generate boolean playlists based on
 tags, ratings, and custom rating order for the randomizer.'''
+long_description = description
+if os.path.isfile("readme.md"):
+    with open("readme.md", "r") as fh:
+        long_description = fh.read()
 
 setuptools.setup(
     name='dmmc',
