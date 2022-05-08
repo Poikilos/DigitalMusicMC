@@ -57,8 +57,10 @@ setuptools.setup(
     license='MIT',
     # packages=setuptools.find_packages(),
     packages=['dmmc'],
-    # include_package_data=True,  # look for MANIFEST.in
-    # scripts=['example'] ,
+    include_package_data=True,  # look for MANIFEST.in
+    # scripts=['example'],
+    # ^ Don't use scripts anymore (according to
+    #   <https://stackoverflow.com/a/28119736>).
     # See <https://stackoverflow.com/questions/27784271/
     # how-can-i-use-setuptools-to-generate-a-console-scripts-entry-
     # point-which-calls>
@@ -75,4 +77,4 @@ setuptools.setup(
     test_suite='nose.collector',
     tests_require=['nose', 'nose-cover3'],
     zip_safe=False,  # It can't run zipped due to needing data files.
- )
+)
