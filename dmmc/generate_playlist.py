@@ -70,7 +70,7 @@ if os.path.isdir(folder_path):
 
             for part in parts:
                 # Sean's Naming Scheme (SNS):
-                # - See SNS.md in the DigitalMusicMC/docs directory.
+                # - See SNS.md in the DigitalMusicMC/doc directory.
                 part=part.strip()
                 # print(part)
                 index += 1

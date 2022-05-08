@@ -189,7 +189,7 @@ Combining the data allows shuffling (or generating shuffled playlists) intellige
 
 ## Optional
 - add from.Sean filename-based tag generation
-  - see [docs/filename-based_tag_generation--Sean_scheme.md](docs/filename-based_tag_generation--Sean_scheme.md)
+  - see [doc/filename-based_tag_generation--Sean_scheme.md](doc/filename-based_tag_generation--Sean_scheme.md)
 - Make able to play AM noise loop in background
 - Add global hook for multimedia keys (play/pause toggle, stop, previous, next) - allow volume and mute to be handled by the OS
 - Search for files that do not have artwork for their album
