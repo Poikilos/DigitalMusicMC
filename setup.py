@@ -68,6 +68,7 @@ setuptools.setup(
     entry_points={
         'console_scripts': [
             'add-to-strawberry=dmmc.strawberry:main',
+            'transfer-playlist=dmmc.portable:transfer_playlist_cli',
         ],
     },
     install_requires=install_requires,

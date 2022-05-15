@@ -11,7 +11,7 @@ def debug(*args, **kwargs):
         sys.stderr.write("[debug] ")
         print(*args, file=sys.stderr, **kwargs)
 
-
+# from https://github.com/poikilos/blnk
 def which(cmd):
     paths_str = os.environ.get('PATH')
     if paths_str is None:
