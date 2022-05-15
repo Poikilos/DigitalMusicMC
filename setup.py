@@ -27,9 +27,11 @@ if os.path.isfile("requirements.txt"):
                 continue
             install_requires.append(line)
 
-description = '''Manage a large archival music collection including
-using optional archival syntax. Generate boolean playlists based on
-tags, ratings, and custom rating order for the randomizer.'''
+description = (
+    "Manage a large archival music collection including"
+    " using optional archival syntax. Generate boolean playlists based"
+    " tags, ratings, and custom rating order for the randomizer."
+)
 long_description = description
 if os.path.isfile("readme.md"):
     with open("readme.md", "r") as fh:
@@ -60,10 +62,9 @@ setuptools.setup(
     include_package_data=True,  # look for MANIFEST.in
     # scripts=['example'],
     # ^ Don't use scripts anymore (according to
-    #   <https://stackoverflow.com/a/28119736>).
-    # See <https://stackoverflow.com/questions/27784271/
-    # how-can-i-use-setuptools-to-generate-a-console-scripts-entry-
-    # point-which-calls>
+    #   <https://packaging.python.org/en/latest/guides
+    #   /distributing-packages-using-setuptools
+    #   /?highlight=scripts#scripts>).
     entry_points={
         'console_scripts': [
             'add-to-strawberry=dmmc.strawberry:main',
