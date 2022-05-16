@@ -81,6 +81,7 @@ def transfer_playlist(source_playlist, destination_dir):
     not_commented = 0
     pairs = []
     missing = []
+    copied_new = 0
     with open(source_playlist, 'r') as ins:
         for rawL in ins:
             line = rawL.rstrip()
@@ -128,13 +129,15 @@ def transfer_playlist(source_playlist, destination_dir):
                     error('cp "{}" "{}" --preserve=timestamps'
                           ''.format(line, newPath))
                     shutil.copy(line, newPath)
+                    copied_new += 1
                 changed += 1
             new_lines.append(newLine)
     error("lines: {}".format(len(new_lines)))
     error("missing: {}".format(missing))
     error("music files specified: {}".format(not_commented))
     error("music files found: {}".format(changed))
-    error("copied and made relative: {}".format(changed))
+    error("made relative: {}".format(changed))
+    error("new: {}".format(copied_new))
     destPath = os.path.join(destination_dir, playlistName)
     error('* writing "{}"...'.format(destPath))
     missingName = playlistName + ".missing.txt"
