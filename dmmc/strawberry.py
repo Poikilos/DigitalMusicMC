@@ -5,6 +5,14 @@ import subprocess
 
 verbose = False
 
+for argI in range(1, len(sys.argv)):
+    arg = sys.argv[argI]
+    if arg.startswith("--"):
+        if arg == "--debug":
+            verbose = True
+        elif arg == "--verbose":
+            verbose = True
+
 
 def debug(*args, **kwargs):
     if verbose:
