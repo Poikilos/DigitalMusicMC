@@ -2,47 +2,17 @@
 import sys
 import os
 import subprocess
-
-verbose = False
-
-for argI in range(1, len(sys.argv)):
-    arg = sys.argv[argI]
-    if arg.startswith("--"):
-        if arg == "--debug":
-            verbose = True
-        elif arg == "--verbose":
-            verbose = True
-
-
-def debug(*args, **kwargs):
-    if verbose:
-        sys.stderr.write("[debug] ")
-        print(*args, file=sys.stderr, **kwargs)
-
-# from https://github.com/poikilos/blnk
-def which(cmd):
-    paths_str = os.environ.get('PATH')
-    if paths_str is None:
-        debug("Warning: There is no PATH variable, so returning {}"
-              "".format(cmd))
-        return cmd
-    paths = paths_str.split(os.path.pathsep)
-    for path in paths:
-        debug("looking in {}".format(path))
-        tryPath = os.path.join(path, cmd)
-        if os.path.isfile(tryPath):
-            return tryPath
-        else:
-            debug("There is no {}".format(tryPath))
-    return None
-
-
-
-
-# See <https://stackoverflow.com/questions/5574702
-# /how-to-print-to-stderr-in-python>:
-def error(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+# if os.path.isdir(os.path.join("..", "dmmc")):
+#     # sys.path = ["..", sys.path]
+#     sys.path.append("..")
+from dmmc import (
+    # PlaylistM3U,
+    echo0,
+    echo1,
+    echo2,
+    set_verbosity,
+    which,
+)
 
 
 # tryPath = "(New) 2022-04-01 OCR4242-4325.txt"
@@ -74,7 +44,7 @@ def strawberry_add_to_playlist(path):
                 "Neither strawberry nor flatpak is in the path."
             )
         else:
-            error("Warning: strawberry isn't in path. Trying {}..."
+            echo0("Warning: strawberry isn't in path. Trying {}..."
                   "".format(stawberryPath))
     else:
         strawberryParts = [strawberryPath]
@@ -101,7 +71,7 @@ def strawberry_add_to_playlist_from(path):
     - See strawberry_add_to_playlist.
     '''
     count = 0
-    debug('* reading paths from "{}"'.format(path))
+    echo1('* reading paths from "{}"'.format(path))
     with open(path, 'r') as ins:
         lineN = 0
         for rawL in ins:
@@ -112,7 +82,7 @@ def strawberry_add_to_playlist_from(path):
             if line.startswith("#"):
                 continue
             if not os.path.isfile(line):
-                error("* \"{}\" does not exist.".format(line))
+                echo0("* \"{}\" does not exist.".format(line))
                 continue
             ok = strawberry_add_to_playlist(line)
             if ok:
@@ -121,7 +91,6 @@ def strawberry_add_to_playlist_from(path):
 
 
 def main():
-    global verbose
     src = None
     '''
     if os.path.isfile(tryPath):
@@ -130,7 +99,7 @@ def main():
     '''
     options = {}
     next_name = None
-    bool_names = ["verbose"]
+    bool_names = ["verbose", "debug"]
     for argI in range(1, len(sys.argv)):
         arg = sys.argv[argI]
         if next_name is not None:
@@ -141,24 +110,28 @@ def main():
             if name in bool_names:
                 options[name] = True
                 if name == "verbose":
-                    verbose = True
-                    debug("Verbose logging is enabled.")
+                    set_verbosity(1)
+                    echo1("Verbose logging level 1 is enabled.")
+                elif name == "debug":
+                    set_verbosity(2)
+                    echo1("Verbose logging level 2 is enabled.")
             else:
                 next_name = name
         elif src is None:
             if not os.path.isfile(arg):
-                error("Error: {} doesn't exist.".format(arg))
+                echo0("Error: {} doesn't exist.".format(arg))
             elif not arg.endswith(".txt"):
-                error("Error: {} is not a .txt file.".format(arg))
+                echo0("Error: {} is not a .txt file.".format(arg))
             else:
                 src = arg
     if src is None:
-        error("You must provide a txt file (or m3u) that is a list of"
+        echo0("You must provide a txt file (or m3u) that is a list of"
               " music files to add to the current Strawberry playlist.")
-        exit(1)
+        return 1
     count = strawberry_add_to_playlist_from(src)
     print("* Done (added {} songs)".format(count))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

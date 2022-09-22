@@ -32,15 +32,32 @@ initializePreloadScreen = True
 
 myFileName = os.path.basename(__file__)
 
-def error(msg):
-    sys.stderr.write("{}\n".format(msg))
+readLink = None
+try:
+    readLink = os.readlink(__file__)
+except OSError:
+    # not a link
+    readLink = __file__
+realFile = os.path.realpath(readLink)
+dataPath = os.path.dirname(realFile)
+# try:
+#     import dmmc
+# except ImportError:
+#     sys.path.append(os.path.dirname(dataPath))
+
+from dmmc import (
+    echo0,
+    echo1,
+    echo2,
+    set_verbosity,
+)
 
 def showTitle():
-    error("")
-    error("")
+    echo0("")
+    echo0("")
     title = myName  # os.path.basename(sys.argv[0])
-    error(title)
-    error("-"*len(title))
+    echo0(title)
+    echo0("-"*len(title))
 
 
 myName = "unmangle"
@@ -55,29 +72,14 @@ for songExt in songExts:
     songDotExts.append('.'+songExt)
 
 
-readLink = None
-try:
-    readLink = os.readlink(__file__)
-except OSError:
-    # not a link
-    readLink = __file__
-realFile = os.path.realpath(readLink)
-dataPath = os.path.dirname(realFile)
-# error("dataPath: {}".format(dataPath))
+
+# echo0("dataPath: {}".format(dataPath))
 unusableChars = {}
 unusableCharFiles = {}
 unusableCharsPath = os.path.join(dataPath, "data", "characters")
 if not os.path.isdir(unusableCharsPath):
     raise RuntimeError("unusableCharsPath is missing: \"{}\""
                        "".format(unusableCharsPath))
-try:
-    from dmmc.common import *
-except ModuleNotFoundError:
-    sys.path.append(os.path.dirname(dataPath))
-    from dmmc.common import *
-
-# setVerbose(True)
-
 
 nameChars = {
     "space": " ",
@@ -185,34 +187,33 @@ for sub in os.listdir(unusableCharsPath):
                             # to Geany
                         except UnicodeDecodeError as ex3:
                             key = None
-                            error("[{}] * (UnicodeDecodeError)"
+                            echo0("[{}] * (UnicodeDecodeError)"
                                   " couldn't finish reading \"{}\":"
                                   "".format(myFileName, subPath))
                     else:
-                        error("[{}] * (unknown error) couldn't finish"
+                        echo0("[{}] * (unknown error) couldn't finish"
                         " reading \"{}\":".format(myFileName, subPath))
                         raise ex2
             else:
-                error("[{}] * (unknown error) couldn't finish"
+                echo0("[{}] * (unknown error) couldn't finish"
                       " reading \"{}\":".format(myFileName, subPath))
                 raise ex
-        if getVerbose():
-            error("* gathering unusable character from \"{}\""
-                  "".format(sub))
+        echo1("* gathering unusable character from \"{}\""
+              "".format(sub))
         if key is None:
             continue
         if key in unusableChars.keys():
             if initializePreloadScreen:
                 showTitle()
                 initializePreloadScreen = False
-            error("[unmangle] Warning: The unusable{} character from"
+            echo0("[unmangle] Warning: The unusable{} character from"
                   " \"{}\" was already collected from \"{}\" and will"
                   " be ignored."
                   "".format(tryDelimiter, sub, unusableCharFiles[key]))
             continue
         unusableChars[key] = pathChar
         unusableCharFiles[key] = sub
-# error("badChars:{}".format(badChars))
+# echo0("badChars:{}".format(badChars))
 
 # These are marks that come after an alphabetical letter and don't work
 # otherwise. See "handled-by-code" under "Required Data" in readme.
@@ -264,7 +265,7 @@ def isFilenameChar(c, index=-1):
 
 
 def usage():
-    error(usageS)
+    echo0(usageS)
 
 digits = "0123456789"
 alphaLowerChars = "abcdefghijklmnopqrstuvwxyz"
@@ -324,7 +325,7 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
             continue
         albumParts = album.split(albumSep)
         cleanAlbum = albumParts[-1]
-        error(cleanAlbum)
+        echo0(cleanAlbum)
         songCount = 0
         historyPath = os.path.join(albumPath, "original_names.json")
         changed = {}
@@ -351,7 +352,7 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
                     elif isDigits(songParts[-3][:trackDigitsMin]):
                         songName = songSep.join(songParts[-3:])
                     else:
-                        error("  * Warning: No part of {} starts"
+                        echo0("  * Warning: No part of {} starts"
                               "    with a 2-digit track number.")
                 if isDigits(songParts[-1][trackDigitsMin+1:]):
                     # In case the song name starts with more than 2
@@ -361,7 +362,7 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
                     elif isDigits(songParts[-3][:trackDigitsMin]):
                         songName = songSep.join(songParts[-3:])
                     # else:
-                        # error("  * Warning: No part of {} starts"
+                        # echo0("  * Warning: No part of {} starts"
                         #       "    with a 2-digit track number.")
                 '''
             cleanName = ""
@@ -385,7 +386,7 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
                     elif c != "":
                         prevSpace = False
                 else:
-                    error("removed chr({}) from...".format(ord(c)))
+                    echo0("removed chr({}) from...".format(ord(c)))
                     if not prevBad:
                         cleanName += "_"
                         prevSpace = False
@@ -393,7 +394,7 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
             cleanSplitName = os.path.splitext(cleanName)
             cleanName = (cleanSplitName[0].strip()
                          + cleanSplitName[1].strip())
-            error("  {}".format(cleanName))
+            echo0("  {}".format(cleanName))
             if cleanName != song:
                 changed['songs'][cleanName] = song
                 cleanPath = os.path.join(albumPath, cleanName)
@@ -420,11 +421,11 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
                       "".format(albumPath, cleanAlbumPath))
             else:
                 shutil.move(albumPath, cleanAlbumPath)
-        error("  * processed {} song(s) in {}"
+        echo0("  * processed {} song(s) in {}"
               " ({} {})"
               "".format(songCount, cleanAlbum, verb, albumFileRenames))
-        error("")
-    error("* {} {} files and {} directory(ies) total"
+        echo0("")
+    echo0("* {} {} files and {} directory(ies) total"
           "".format(verb, fileRenames, folderRenames))
 
 def main():
@@ -433,10 +434,10 @@ def main():
         showTitle()
         initializePreloadScreen = False
     if len(sys.argv) != 2:
-        error("")
+        echo0("")
         usage()
-        exit(1)
+        return 1
     processBand(".", sys.argv[1])
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

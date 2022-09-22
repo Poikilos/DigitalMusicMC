@@ -37,13 +37,13 @@ import shutil
 
 
 from dmmc import (
-    error,
+    echo0,
     OSCaseSensitive,
 )
 
 
 def usage():
-    error(__doc__)
+    echo0(__doc__)
 
 
 def transfer_playlist(source_playlist, destination_dir):
@@ -126,20 +126,20 @@ def transfer_playlist(source_playlist, destination_dir):
                     os.makedirs(newDir)
                     # print('mkdir -p "{}"'.format(newDir))
                 if not os.path.isfile(newPath):
-                    error('cp "{}" "{}" --preserve=timestamps'
+                    echo0('cp "{}" "{}" --preserve=timestamps'
                           ''.format(line, newPath))
                     shutil.copy(line, newPath)
                     copied_new += 1
                 changed += 1
             new_lines.append(newLine)
-    error("lines: {}".format(len(new_lines)))
-    error("missing: {}".format(missing))
-    error("music files specified: {}".format(not_commented))
-    error("music files found: {}".format(changed))
-    error("made relative: {}".format(changed))
-    error("new: {}".format(copied_new))
+    echo0("lines: {}".format(len(new_lines)))
+    echo0("missing: {}".format(missing))
+    echo0("music files specified: {}".format(not_commented))
+    echo0("music files found: {}".format(changed))
+    echo0("made relative: {}".format(changed))
+    echo0("new: {}".format(copied_new))
     destPath = os.path.join(destination_dir, playlistName)
-    error('* writing "{}"...'.format(destPath))
+    echo0('* writing "{}"...'.format(destPath))
     missingName = playlistName + ".missing.txt"
     missingPath = os.path.join(destination_dir, missingName)
     with open(destPath, 'w') as outs:
@@ -150,29 +150,30 @@ def transfer_playlist(source_playlist, destination_dir):
         with open(missingPath, 'w') as outs:
             for line in missing:
                 outs.write(line + "\n")
-    error("  * done")
-
+    echo0("  * done")
+    return 0
 
 
 def transfer_playlist_cli():
     if (len(sys.argv) > 1) and (sys.argv[1] == "--help"):
         usage()
-        exit(0)
+        return 0
     if len(sys.argv) < 3:
         usage()
         raise ValueError(
             "You must provide a source playlist and destination directory."
         )
-    transfer_playlist(sys.argv[1], sys.argv[2])
+    return transfer_playlist(sys.argv[1], sys.argv[2])
 
 
 def main():
     usage()
-    error("")
-    error("Error:")
-    error("This module should be imported or called from the CLI.")
-    error("")
+    echo0("")
+    echo0("Error:")
+    echo0("This module should be imported or called from the CLI.")
+    echo0("")
+    return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
