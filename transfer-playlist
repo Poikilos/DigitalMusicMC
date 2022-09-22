@@ -2,7 +2,22 @@
 # -*- coding: utf-8 -*-
 import re
 import sys
+import os
+import platform
+
+HOME = None
+if platform.system() == "Windows":
+    HOME = os.environ['USERPROFILE']
+else:
+    HOME = os.environ['HOME']
+try_modules_path = os.path.join(HOME, "git", "DigitalMusicMC")
+if os.path.isfile(os.path.join(try_modules_path, "dmmc", "__init__.py")):
+    sys.stderr.write('* using dmmc from "{}"\n'.format(try_modules_path))
+    sys.stderr.flush()
+    sys.path.insert(0, try_modules_path)
+
 from dmmc.portable import transfer_playlist_cli
+
 if __name__ == '__main__':
     sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
     sys.exit(transfer_playlist_cli())
