@@ -9,6 +9,7 @@ The main focus on the project right now is to generate playlists intelligently.
 This project is a Python remake of a C# program I made that was never released (but was usable for certain tasks).
 - So far this Python remake can:
   - (WIP) (`dmmc/unmangle.py`) unmangle filenames by removing characters not compatible with some operating systems or file systems such as FAT32 for portable devices or drives used by car music players
+    - The resulting name should be used as the destination in any copy or move operation when exporting.
   - (`dmmc/generate_playlist.py`) generate playlists (Shuffle using numbers in the filename as per the *Sean's Naming Scheme*--See below--This should improve eventually).
 - The PlaylistM3U (in the dmmc module) can load playlists.
 - This project has been in the pre-alpha stage since at least 2010 as a C# GUI program that can:
