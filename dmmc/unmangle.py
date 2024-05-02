@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-'''
+"""
 - Operate where the current directory is the band directory containing
   album directories that contain music files.
 - The files and directories may be weird, named with space-padded
@@ -22,7 +22,7 @@ space-hyphen-space [" - "] delimited directory names) in quotes.
 
 Example:
 unmangle.py "Stratford Ct."
-'''
+"""
 import sys
 import os
 import json
@@ -52,12 +52,13 @@ from dmmc import (
     set_verbosity,
 )
 
+
 def showTitle():
     echo0("")
     echo0("")
     title = myName  # os.path.basename(sys.argv[0])
     echo0(title)
-    echo0("-"*len(title))
+    echo0("-" * len(title))
 
 
 myName = "unmangle"
@@ -66,11 +67,10 @@ __author__ = "Jake Gustafson"
 startCLIi = __doc__.find("Command Line Interface")
 usageS = __doc__[startCLIi:]
 
-songExts = ['mp3', 'wav', 'flac', 'alac', 'aac', 'mp4', 'm4a', 'ape']
+songExts = ["mp3", "wav", "flac", "alac", "aac", "mp4", "m4a", "ape"]
 songDotExts = []
 for songExt in songExts:
-    songDotExts.append('.'+songExt)
-
+    songDotExts.append("." + songExt)
 
 
 # echo0("dataPath: {}".format(dataPath))
@@ -78,13 +78,14 @@ unusableChars = {}
 unusableCharFiles = {}
 unusableCharsPath = os.path.join(dataPath, "data", "characters")
 if not os.path.isdir(unusableCharsPath):
-    raise RuntimeError("unusableCharsPath is missing: \"{}\""
-                       "".format(unusableCharsPath))
+    raise RuntimeError(
+        'unusableCharsPath is missing: "{}"' "".format(unusableCharsPath)
+    )
 
 nameChars = {
     "space": " ",
     "apostraphe": "'",
-    "doublequote": "\"",
+    "doublequote": '"',
     "singlequote": "'",
     "dash": "--",
 }
@@ -98,14 +99,14 @@ windowsBadChars = ""
 for i in range(0, 32):
     windowsBadChars += chr(i)
 windowsBadChars += '"'  # 34
-windowsBadChars += '*'  # 42
-windowsBadChars += '/'  # 47
-windowsBadChars += ':'  # 58
-windowsBadChars += '<'  # 60
-windowsBadChars += '>'  # 62
-windowsBadChars += '?'  # 63
-windowsBadChars += '\\'  # 92
-windowsBadChars += '|'  # 124
+windowsBadChars += "*"  # 42
+windowsBadChars += "/"  # 47
+windowsBadChars += ":"  # 58
+windowsBadChars += "<"  # 60
+windowsBadChars += ">"  # 62
+windowsBadChars += "?"  # 63
+windowsBadChars += "\\"  # 92
+windowsBadChars += "|"  # 124
 
 # See <https://stackoverflow.com/questions/1033424/how-to-remove-bad-
 # path-characters-in-python>:
@@ -119,24 +120,28 @@ for c in windowsBadChars:
     if c not in badChars:
         badChars += c
 
-def getOneChar(path, encoding='utf-8-sig'):
+
+def getOneChar(path, encoding="utf-8-sig"):
     ret = ""
     try:
-        with open(path, 'r', encoding=encoding) as ins:
+        with open(path, "r", encoding=encoding) as ins:
             for rawL in ins:
                 line = rawL.rstrip("\n\r")
                 if len(line) > 1:
-                    raise ValueError("\"{}\" must contain only one"
-                                     " character per line but has"
-                                     " {}: \"{}\""
-                                     "".format(path, len(line), line))
+                    raise ValueError(
+                        '"{}" must contain only one'
+                        " character per line but has"
+                        ' {}: "{}"'
+                        "".format(path, len(line), line)
+                    )
                 if len(line) < 1:
                     continue
                 ret += line
                 break
         if len(ret) != 1:
-            raise ValueError("\"{}\" must contain at least one"
-                             " character.".format(path))
+            raise ValueError(
+                '"{}" must contain at least one' " character.".format(path)
+            )
     except TypeError as ex:
         if "invalid keyword" in str(ex):
             raise RuntimeError("This program requires Python 3.")
@@ -147,17 +152,20 @@ def getOneChar(path, encoding='utf-8-sig'):
 
 def getFirstCharOfLines(path):
     ret = ""
-    with open(path, 'r') as ins:
+    with open(path, "r") as ins:
         for rawL in ins:
             line = rawL.rstrip("\n\r")
             if len(line) > 1:
-                raise ValueError("\"{}\" must contain only one"
-                                 " character per line but has {}."
-                                 "".format(path, len(line)))
+                raise ValueError(
+                    '"{}" must contain only one'
+                    " character per line but has {}."
+                    "".format(path, len(line))
+                )
             if len(line) < 1:
                 continue
             ret += line
     return ret
+
 
 for sub in os.listdir(unusableCharsPath):
     subPath = os.path.join(unusableCharsPath, sub)
@@ -174,42 +182,49 @@ for sub in os.listdir(unusableCharsPath):
             pathChar = asChar
         key = None
         try:
-            key = getOneChar(subPath, encoding='utf-8-sig')
+            key = getOneChar(subPath, encoding="utf-8-sig")
         except ValueError as ex:
             if "invalid start byte" in str(ex):
                 try:
-                    key = getOneChar(subPath, encoding='utf-8')
+                    key = getOneChar(subPath, encoding="utf-8")
                 except ValueError as ex2:
                     if "invalid start byte" in str(ex):
                         try:
-                            key = getOneChar(subPath, encoding='utf-16')
+                            key = getOneChar(subPath, encoding="utf-16")
                             # hyphen-faux.txt is 'iso-8859-1' according
                             # to Geany
                         except UnicodeDecodeError as ex3:
                             key = None
-                            echo0("[{}] * (UnicodeDecodeError)"
-                                  " couldn't finish reading \"{}\":"
-                                  "".format(myFileName, subPath))
+                            echo0(
+                                "[{}] * (UnicodeDecodeError)"
+                                ' couldn\'t finish reading "{}": {}'
+                                "".format(myFileName, subPath, ex3)
+                            )
                     else:
-                        echo0("[{}] * (unknown error) couldn't finish"
-                        " reading \"{}\":".format(myFileName, subPath))
+                        echo0(
+                            "[{}] * (unknown error) couldn't finish"
+                            ' reading "{}":'.format(myFileName, subPath)
+                        )
                         raise ex2
             else:
-                echo0("[{}] * (unknown error) couldn't finish"
-                      " reading \"{}\":".format(myFileName, subPath))
+                echo0(
+                    "[{}] * (unknown error) couldn't finish"
+                    ' reading "{}":'.format(myFileName, subPath)
+                )
                 raise ex
-        echo1("* gathering unusable character from \"{}\""
-              "".format(sub))
+        echo1('* gathering unusable character from "{}"' "".format(sub))
         if key is None:
             continue
         if key in unusableChars.keys():
             if initializePreloadScreen:
                 showTitle()
                 initializePreloadScreen = False
-            echo0("[unmangle] Warning: The unusable{} character from"
-                  " \"{}\" was already collected from \"{}\" and will"
-                  " be ignored."
-                  "".format(tryDelimiter, sub, unusableCharFiles[key]))
+            echo0(
+                "[unmangle] Warning: The unusable{} character from"
+                ' "{}" was already collected from "{}" and will'
+                " be ignored."
+                "".format(tryDelimiter, sub, unusableCharFiles[key])
+            )
             continue
         unusableChars[key] = pathChar
         unusableCharFiles[key] = sub
@@ -240,20 +255,25 @@ unusableChars[chr(12301)] = ""  # box-outline-single-thin-bottom_right
 # From STRATFORD CT. - CONFERO - Harrison:
 # unusableChars[chr(chr(10047))] = ""  # flower
 
+
 def isFilenameChar(c, index=-1):
-    '''
-    Sequential arguments:
-    c -- usually a string of length 1, but can be longer if index is
-         specified.
-    index -- This will be used as an index in c if positive for when c
-             is more than one character.
-    '''
+    """Check of a character valid for use in a filename.
+    This function is rather strict for cross-platform purposes.
+
+    Args:
+        c (str): usually a string of length 1, but can be longer if
+            index is specified.
+        index (int): This will be used as an index in c if positive for
+            when c is more than one character.
+    """
     s = None
     if index < 0:
         if len(c) != 1:
-            raise ValueError("isFilenameChar expected a single"
-                             " character or a string & index but got {}"
-                             " characters: \"{}\".".format(len(c), c))
+            raise ValueError(
+                "isFilenameChar expected a single"
+                " character or a string & index but got {}"
+                ' characters: "{}".'.format(len(c), c)
+            )
     else:
         s = c
         c = c[index]
@@ -267,11 +287,13 @@ def isFilenameChar(c, index=-1):
 def usage():
     echo0(usageS)
 
+
 digits = "0123456789"
 alphaLowerChars = "abcdefghijklmnopqrstuvwxyz"
 alphaChars = alphaLowerChars
 for c in alphaLowerChars:
     alphaChars += c.upper()
+
 
 def isDigits(s):
     for c in s:
@@ -280,9 +302,15 @@ def isDigits(s):
     return True
 
 
-def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
-                trackDigitsMin=2, output_only=False):
-    '''
+def processBand(
+    bandPath,
+    bandName,
+    songSep=" - ",
+    albumSep=" - ",
+    trackDigitsMin=2,
+    output_only=False,
+):
+    """
     Sequential arguments:
     bandPath -- The band directory contains album directories which
                 contain song files, and only directories and files in
@@ -311,7 +339,7 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
                       neither, then only keep last part).
     output_only -- Output rename commands and do not actually rename
                    any files.
-    '''
+    """
     fileRenames = 0
     folderRenames = 0
     bandPath = os.path.realpath(bandPath)
@@ -329,11 +357,11 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
         songCount = 0
         historyPath = os.path.join(albumPath, "original_names.json")
         changed = {}
-        changed['songs'] = {}
+        changed["songs"] = {}
         for song in os.listdir(albumPath):
             songPath = os.path.join(albumPath, song)
             songNoExt = os.path.splitext(song)[-1]
-            if not songNoExt.lower() in songDotExts:
+            if songNoExt.lower() not in songDotExts:
                 continue
             songParts = song.split(songSep)
             songName = songParts[-1]
@@ -345,7 +373,7 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
                     songName = songSep.join(songParts[-2:])
                 elif isDigits(songParts[-3][:trackDigitsMin]):
                     songName = songSep.join(songParts[-3:])
-                '''
+                """
                 if not isDigits(songParts[-1][:trackDigitsMin]):
                     if isDigits(songParts[-2][:trackDigitsMin]):
                         songName = songSep.join(songParts[-2:])
@@ -364,7 +392,7 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
                     # else:
                         # echo0("  * Warning: No part of {} starts"
                         #       "    with a 2-digit track number.")
-                '''
+                """
             cleanName = ""
             prevBad = False
             prevSpace = False
@@ -392,41 +420,43 @@ def processBand(bandPath, bandName, songSep=" - ", albumSep=" - ",
                         prevSpace = False
                     prevBad = True
             cleanSplitName = os.path.splitext(cleanName)
-            cleanName = (cleanSplitName[0].strip()
-                         + cleanSplitName[1].strip())
+            cleanName = cleanSplitName[0].strip() + cleanSplitName[1].strip()
             echo0("  {}".format(cleanName))
             if cleanName != song:
-                changed['songs'][cleanName] = song
+                changed["songs"][cleanName] = song
                 cleanPath = os.path.join(albumPath, cleanName)
                 fileRenames += 1
                 albumFileRenames += 1
                 if output_only:
-                    print("mv \"{}\" \"{}\""
-                          "".format(songPath, cleanPath))
+                    print('mv "{}" "{}"' "".format(songPath, cleanPath))
                 else:
                     shutil.move(songPath, cleanPath)
             songCount += 1
         if cleanAlbum != album:
-            if 'folders' not in changed:
-                changed['folders'] = {}
-            changed['folders'][cleanAlbum] = album
+            if "folders" not in changed:
+                changed["folders"] = {}
+            changed["folders"][cleanAlbum] = album
             cleanAlbumPath = os.path.join(bandPath, cleanAlbum)
         if not os.path.isfile(historyPath):
-            with open(historyPath, 'w') as outs:
+            with open(historyPath, "w") as outs:
                 json.dump(changed, outs, sort_keys=True, indent=2)
         if cleanAlbum != album:
             folderRenames += 1
             if output_only:
-                print("mv \"{}\" \"{}\""
-                      "".format(albumPath, cleanAlbumPath))
+                print('mv "{}" "{}"' "".format(albumPath, cleanAlbumPath))
             else:
                 shutil.move(albumPath, cleanAlbumPath)
-        echo0("  * processed {} song(s) in {}"
-              " ({} {})"
-              "".format(songCount, cleanAlbum, verb, albumFileRenames))
+        echo0(
+            "  * processed {} song(s) in {}"
+            " ({} {})"
+            "".format(songCount, cleanAlbum, verb, albumFileRenames)
+        )
         echo0("")
-    echo0("* {} {} files and {} directory(ies) total"
-          "".format(verb, fileRenames, folderRenames))
+    echo0(
+        "* {} {} files and {} directory(ies) total"
+        "".format(verb, fileRenames, folderRenames)
+    )
+
 
 def main():
     global initializePreloadScreen
@@ -438,6 +468,7 @@ def main():
         usage()
         return 1
     processBand(".", sys.argv[1])
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -15,8 +15,11 @@ for argI in range(1, len(sys.argv)):
         elif arg == "--debug":
             verbosity = 2
 
+
 def echo0(*args, **kwargs):
+    # critical
     print(*args, file=sys.stderr, **kwargs)
+
 
 # ~/.local/share/strawberry/strawberry/strawberry.db
 # ^ Yes, there is a strawberry folder in a strawberry folder :(
@@ -25,12 +28,24 @@ def echo0(*args, **kwargs):
 
 def echo1(*args, **kwargs):
     if verbosity >= 1:
-        sys.stderr.write("[debug] ")
+        sys.stderr.write("[error] ")
         print(*args, file=sys.stderr, **kwargs)
 
 
 def echo2(*args, **kwargs):
     if verbosity >= 2:
+        sys.stderr.write("[warning] ")
+        print(*args, file=sys.stderr, **kwargs)
+
+
+def echo3(*args, **kwargs):
+    if verbosity >= 3:
+        sys.stderr.write("[info] ")
+        print(*args, file=sys.stderr, **kwargs)
+
+
+def echo4(*args, **kwargs):
+    if verbosity >= 4:
         sys.stderr.write("[debug] ")
         print(*args, file=sys.stderr, **kwargs)
 
@@ -49,19 +64,19 @@ def set_verbosity(level):
 
 # from https://github.com/poikilos/blnk
 def which(cmd):
-    paths_str = os.environ.get('PATH')
+    paths_str = os.environ.get("PATH")
     if paths_str is None:
-        debug("Warning: There is no PATH variable, so returning {}"
-              "".format(cmd))
+        echo4("Warning: There is no PATH variable, so returning {}"
+              .format(cmd))
         return cmd
     paths = paths_str.split(os.path.pathsep)
     for path in paths:
-        debug("looking in {}".format(path))
+        echo4("looking in {}".format(path))
         tryPath = os.path.join(path, cmd)
         if os.path.isfile(tryPath):
             return tryPath
         else:
-            debug("There is no {}".format(tryPath))
+            echo4("There is no {}".format(tryPath))
     return None
 
 
@@ -79,12 +94,12 @@ myName = "dmmc"
 musicPaths = []
 
 if platform.system() == "Windows":
-    profile = os.environ['USERPROFILE']
+    profile = os.environ["USERPROFILE"]
     # appsData = os.path.join(profile, "AppData", "Roaming")
-    appsData = os.environ['ROAMING']
+    appsData = os.environ["ROAMING"]
     musicPaths.append(os.path.join(profile, "Music"))
 else:
-    profile = os.environ['HOME']
+    profile = os.environ["HOME"]
     appsData = os.path.join(profile, ".config")
     musicPaths.append(os.path.join(profile, "Music"))
 
@@ -102,7 +117,7 @@ class IPlaylist:
 class LineReader:
 
     encodingBOMs = {}
-    encodingBOMs['latin-1'] = "ï»¿"
+    encodingBOMs["latin-1"] = "ï»¿"
 
     def __init__(self, text):
         self.index = 0
@@ -112,7 +127,7 @@ class LineReader:
         for encoding, bom in LineReader.encodingBOMs.items():
             if len(self.text) < len(bom):
                 continue
-            if self.text[:len(bom)] == bom:
+            if self.text[: len(bom)] == bom:
                 # print('  * using bom "{}"'.format(bom))
                 self.encoding = encoding
                 self.bomLen = len(bom)
@@ -141,7 +156,7 @@ class LineReader:
                 # different, then also get that one as part of the
                 # same line.
                 if self.index + 1 < len(self.text):
-                    if self.text[self.index+1] in tmp:
+                    if self.text[self.index + 1] in tmp:
                         result = result[:-1] + "\n"
                         # ^ Mimic Python behavior by converting the
                         #   character to "\n" and discarding the next
@@ -162,7 +177,7 @@ class PlaylistM3U(IPlaylist):
     def load(self, path):
         # print(path)
         metaOpener = "#EXTINF:"
-        with open(path, 'rb') as ins:
+        with open(path, "rb") as ins:
             data = ins.read()
             text = None
             try:
@@ -171,7 +186,7 @@ class PlaylistM3U(IPlaylist):
                 if "invalid continuation byte" in str(ex):
                     text = data.decode("latin-1")
                 elif "invalid start byte" in str(ex):
-                    text = data.decode('ISO-8859-1')
+                    text = data.decode("ISO-8859-1")
                 else:
                     raise ex
             lineN = 0
@@ -196,24 +211,28 @@ class PlaylistM3U(IPlaylist):
                 elif line == "#EXTM3U":
                     meta = {}
                     if lineN != 1:
-                        echo0("{}:{}:1: misplaced shebang: {}"
-                              "".format(path, lineN, line))
+                        echo0(
+                            "{}:{}:1: misplaced shebang: {}"
+                            "".format(path, lineN, line)
+                        )
                 elif line.startswith(metaOpener):
                     meta = {}
                     metaStr = line[len(metaOpener):]
                     sepI = metaStr.find(",")
                     if sepI < 0:
-                        echo0("{}:{}:1: bad metadata (missing ','): {}"
-                              "".format(path, lineN, line))
+                        echo0(
+                            "{}:{}:1: bad metadata (missing ','): {}"
+                            "".format(path, lineN, line)
+                        )
                         continue
                     meta["seconds"] = metaStr[:sepI]
-                    meta["name"] = metaStr[sepI+1:]
+                    meta["name"] = metaStr[sepI + 1:]
                     print("  - meta: {}".format(meta))
                 # elif line.startswith("/") or line.startswith("./"):
                 elif line.startswith("#"):
                     meta = {}
-                    echo0("{}:{}:1: unknown metadata: {}"
-                          "".format(path, lineN, line))
+                    echo0("{}:{}:1: unknown metadata: {}" ""
+                          .format(path, lineN, line))
                 else:
                     # If it isn't metadata, it should be a song.
                     pass
@@ -224,13 +243,13 @@ class PlaylistM3U(IPlaylist):
 
 
 def getPlaylists(path, recursive=True):
-    '''
+    """
     Sequential arguments:
     path -- Specify a directory containing playlists.
 
     Keyword arguments:
     recursive -- Specify True to also include subdirectories.
-    '''
+    """
     results = []
     for sub in os.listdir(path):
         subPath = os.path.join(path, sub)

@@ -2,10 +2,11 @@
 import sys
 import os
 import subprocess
+
 # if os.path.isdir(os.path.join("..", "dmmc")):
 #     # sys.path = ["..", sys.path]
 #     sys.path.append("..")
-from dmmc import (
+from dmmc import (  # noqa: F401
     # PlaylistM3U,
     echo0,
     echo1,
@@ -20,19 +21,20 @@ tryFPRun = "flatpak run --branch=stable --arch=x86_64"
 tryFPRun += " --command=strawberry"
 tryFPRun += " --file-forwarding org.strawberrymusicplayer.strawberry"
 # ^ Based on flatpak-generated Exec line:
-'''
+"""
 /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=strawberry
 --file-forwarding org.strawberrymusicplayer.strawberry @@u %U @@
-'''
+"""
+
 
 def strawberry_add_to_playlist(path):
-    '''
-    Call strawberry and add the path to the current playlist (The
-    playlist must be open in the Strawberry user interface).
+    """Call strawberry and add the path to the current playlist
+    (The playlist must be open in the Strawberry user interface).
 
     Raises:
-    FileNotFoundError if "Neither strawberry nor flatpak is in the path"
-    '''
+        FileNotFoundError: "Neither strawberry nor flatpak is in the
+            path"
+    """
     strawberryPath = which("strawberry")
     if strawberryPath is None:
         # strawberryPath = "strawberry"
@@ -44,8 +46,10 @@ def strawberry_add_to_playlist(path):
                 "Neither strawberry nor flatpak is in the path."
             )
         else:
-            echo0("Warning: strawberry isn't in path. Trying {}..."
-                  "".format(stawberryPath))
+            echo0(
+                "Warning: strawberry isn't in path. Trying {}..."
+                "".format(stawberryPath)
+            )
     else:
         strawberryParts = [strawberryPath]
     cmdParts = strawberryParts + ["--append", path]
@@ -56,23 +60,22 @@ def strawberry_add_to_playlist(path):
 
 
 def strawberry_add_to_playlist_from(path):
-    '''
-    Add files to Strawberry from the list of names in the list file.
+    """Add files to Strawberry based on names in the list file.
 
-    Sequential arguments:
-    path -- A list file (Can be m3u format since lines starting with '#'
-        are ignored).
+    Raises exceptions: See strawberry_add_to_playlist.
+
+    Args:
+        path (str): A list file (Can be m3u format since lines starting
+            with '#' are ignored).
 
     Returns:
-    the number of files added (based on count of successful strawberry
-    calls).
+        int: the number of files added (based on count of successful
+            strawberry calls).
 
-    Raises:
-    - See strawberry_add_to_playlist.
-    '''
+    """
     count = 0
     echo1('* reading paths from "{}"'.format(path))
-    with open(path, 'r') as ins:
+    with open(path, "r") as ins:
         lineN = 0
         for rawL in ins:
             lineN += 1
@@ -82,7 +85,7 @@ def strawberry_add_to_playlist_from(path):
             if line.startswith("#"):
                 continue
             if not os.path.isfile(line):
-                echo0("* \"{}\" does not exist.".format(line))
+                echo0('* "{}" does not exist.'.format(line))
                 continue
             ok = strawberry_add_to_playlist(line)
             if ok:
@@ -92,11 +95,11 @@ def strawberry_add_to_playlist_from(path):
 
 def main():
     src = None
-    '''
+    """
     if os.path.isfile(tryPath):
         src = tryPath
     if src is None:
-    '''
+    """
     options = {}
     next_name = None
     bool_names = ["verbose", "debug"]
@@ -125,8 +128,10 @@ def main():
             else:
                 src = arg
     if src is None:
-        echo0("You must provide a txt file (or m3u) that is a list of"
-              " music files to add to the current Strawberry playlist.")
+        echo0(
+            "You must provide a txt file (or m3u) that is a list of"
+            " music files to add to the current Strawberry playlist."
+        )
         return 1
     count = strawberry_add_to_playlist_from(src)
     print("* Done (added {} songs)".format(count))
