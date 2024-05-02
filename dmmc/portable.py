@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-'''
+"""
 dmmc.portable
 
 This file is part of the DigitalMusicMC project.
@@ -29,7 +29,7 @@ transfer_playlist <source playlist m3u> <destination directory>
 
 Example:
 transfer-playlist "$HOME/Music/(.Tag) Dance.m3u" /media/$USER/SANDISK32/Music
-'''
+"""
 from __future__ import print_function
 import sys
 import os
@@ -47,12 +47,12 @@ def usage():
 
 
 def transfer_playlist(source_playlist, destination_dir):
-    '''
+    """
     See the docstring for the portable module.
 
     Raises:
     - OSError: [Errno 28] No space left on device: ...
-    '''
+    """
     if not os.path.isfile(source_playlist):
         raise ValueError("{} is not a file.".format(source_playlist))
     if len(destination_dir) == 0:
@@ -73,8 +73,8 @@ def transfer_playlist(source_playlist, destination_dir):
     if oldRootLower == destLower:
         raise ValueError(
             "The source is same as the destination (OSCaseSensitive={}"
-            ", oldRoot=\"{}\", destination_dir=\"{}\")."
-            "".format(OSCaseSensitive, oldRoot)
+            ', oldRoot="{}", destination_dir="{}").'
+            "".format(OSCaseSensitive, oldRoot, destination_dir)
         )
     changed = 0
     found = 0
@@ -82,7 +82,7 @@ def transfer_playlist(source_playlist, destination_dir):
     pairs = []
     missing = []
     copied_new = 0
-    with open(source_playlist, 'r') as ins:
+    with open(source_playlist, "r") as ins:
         for rawL in ins:
             line = rawL.rstrip()
             if (len(line.strip()) == 0) or line.startswith("#"):
@@ -126,8 +126,8 @@ def transfer_playlist(source_playlist, destination_dir):
                     os.makedirs(newDir)
                     # print('mkdir -p "{}"'.format(newDir))
                 if not os.path.isfile(newPath):
-                    echo0('cp "{}" "{}" --preserve=timestamps'
-                          ''.format(line, newPath))
+                    echo0('cp "{}" "{}" --preserve=timestamps' ""
+                          .format(line, newPath))
                     shutil.copy(line, newPath)
                     copied_new += 1
                 changed += 1
@@ -142,12 +142,12 @@ def transfer_playlist(source_playlist, destination_dir):
     echo0('* writing "{}"...'.format(destPath))
     missingName = playlistName + ".missing.txt"
     missingPath = os.path.join(destination_dir, missingName)
-    with open(destPath, 'w') as outs:
+    with open(destPath, "w") as outs:
         for line in new_lines:
             # print(line)
             outs.write(line + "\n")
     if len(missing) > 0:
-        with open(missingPath, 'w') as outs:
+        with open(missingPath, "w") as outs:
             for line in missing:
                 outs.write(line + "\n")
     echo0("  * done")
