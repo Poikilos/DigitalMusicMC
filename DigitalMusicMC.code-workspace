@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"shellcheck.exclude": [
+			"1017"
+		],
+		"trailing-spaces.trimOnSave": true,
+	}
+}
